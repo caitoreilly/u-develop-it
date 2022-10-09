@@ -35,7 +35,11 @@ const db = mysql.createConnection(
 // return statement will exit the DB call once an error is encountered
 // if no error, then err is null & response is sent back w/ success message etc.
 app.get("/api/candidates", (req, res) => {
-  const sql = `SELECT * FROM candidates`;
+  const sql = `SELECT candidates.*, parties.name
+  AS party_name
+  FROM candidates
+  LEFT JOIN parties
+  ON candidates.party_id = parties.id`;
 
   db.query(sql, (err, rows) => {
     if (err) {
@@ -57,7 +61,12 @@ app.get("/api/candidates", (req, res) => {
 // error status code is 400 to notify client that their request was not accepted & to try a diff request
 // in route response, we send the row back to the client in a json object
 app.get("/api/candidate/:id", (req, res) => {
-  const sql = `SELECT * FROM candidates WHERE id = ?`;
+  const sql = `SELECT candidates.*, parties.name
+  AS party_name
+  FROM candidates
+  LEFT JOIN parties
+  ON candidates.party_id = parties.id
+  WHERE candidates.id = ?`;
   const params = [req.params.id];
 
   db.query(sql, params, (err, row) => {
