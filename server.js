@@ -23,6 +23,11 @@ const db = mysql.createConnection(
   console.log("Connected to the election database.")
 );
 
+// query the database to test the connection & return all the data in the candidates table
+db.query(`SELECT * FROM candidates`, (err, rows) => {
+  console.log(rows);
+});
+
 // add a route to handle user requests that are not supported by the app
 // default response for any other request (Not Found)
 app.use((req, res) => {
