@@ -148,6 +148,39 @@ app.post("/api/candidate", ({ body }, res) => {
   });
 });
 
+// Update a candidate's party
+// using req.params.id parameter for candidate's id but the request body contains the party's id (req.body.party_id)
+// the affected row's id should always be part of the route (ex. api/candidate/2) while the actual fields we're updating should be part of the body
+app.put('/api/candidate/:id', (req, res) => {
+  // Candidate is allowed to not have party affiliation
+  // forces any PUT request to /api/candidates/:id to incldue a party_id property 
+  const errors = inputCheck(req.body, 'party_id');
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+
+  const sql = `UPDATE candidates SET party_id = ? 
+               WHERE id = ?`;
+  const params = [req.body.party_id, req.params.id];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      // check if a record was found
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Candidate not found'
+      });
+    } else {
+      res.json({
+        message: 'success',
+        data: req.body,
+        changes: result.affectedRows
+      });
+    }
+  });
+});
+
 // get route for all parties
 app.get("/api/parties", (req, res) => {
   const sql = `SELECT * FROM parties`;
