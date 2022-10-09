@@ -1,3 +1,6 @@
+// import mysql2 package
+const mysql = require("mysql2");
+
 // import express
 const express = require("express");
 
@@ -8,6 +11,17 @@ const app = express();
 // add express.js middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// code that will connect the app to the MySQL database
+const db = mysql.createConnection(
+  {
+    host: "localhost",
+    user: "root",
+    password: "Daniel0815!",
+    database: "election",
+  },
+  console.log("Connected to the election database.")
+);
 
 // add a route to handle user requests that are not supported by the app
 // default response for any other request (Not Found)
