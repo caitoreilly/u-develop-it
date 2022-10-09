@@ -70,12 +70,34 @@ app.get("/api/candidate/:id", (req, res) => {
 });
 
 // Delete a candidate
-// db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
+// use the HTTP request method delete()
+// endpoint here also includes a route parameter to uniquely identify the candidate to remove 
+// using prepared SQL statement w/ a placeholder 
+// assign req.params.id to params like in the last route 
+// json object route response will be the message 'deleted' with the changes property set to result.affectedRows - verifies if any rows were changed
+// what is user tries to delete candidate that does not exist? --> else if statement 
+// if no affectedRows as a result of the delete query, that means no candidate by that id 
+// therefore return an approp message to the client "candidate not found"
+app.delete("/api/candidate/:id", (req, res) => {
+  const sql = `DELETE FROM candidates WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.statusMessage(400).json({ error: res.message });
+    } else if (!result.affectedRows) {
+      res.json({
+        message: "Candidate not found",
+      });
+    } else {
+      res.json({
+        message: "deleted",
+        changes: result.affectedRows,
+        id: req.params.id,
+      });
+    }
+  });
+});
 
 // Create a candidate
 // const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected)
